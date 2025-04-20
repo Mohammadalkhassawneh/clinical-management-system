@@ -47,3 +47,6 @@ clinical-management-system/
 - **Doctor**: Can manage appointments, create medical reports, and view patient information
 - **Receptionist**: Can manage patients and appointments
 - **Regular User**: Limited access to view information
+
+## Project setup
+All setup command are write inside start.sh file, so you only need to run ./start.sh from the command line
