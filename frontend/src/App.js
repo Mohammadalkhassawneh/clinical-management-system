@@ -36,6 +36,7 @@ import MedicalReportForm from './components/reports/MedicalReportForm';
 // Auth Context
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/auth/PrivateRoute';
+import ActivityLogs from './components/ActivityLogs';
 
 function App() {
   return (
@@ -58,7 +59,17 @@ function App() {
                 </div>
               </PrivateRoute>
             } />
-
+            <Route path="/activity-logs" element={
+              <PrivateRoute requiredRoles={['admin']}>
+                <div className="d-flex">
+                  <Sidebar />
+                  <div className="content-wrapper">
+                    <Navbar />
+                    <ActivityLogs />
+                  </div>
+                </div>
+              </PrivateRoute>
+            } />
             {/* Dashboard - accessible to all authenticated users */}
             <Route path="/" element={
               <PrivateRoute>

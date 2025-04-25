@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-
+const ActivityLogger = require('../utils/ActivityLogger');
 const User = sequelize.define('User', {
   id: {
     type: DataTypes.INTEGER,
@@ -45,4 +45,54 @@ const User = sequelize.define('User', {
   updatedAt: 'updated_at'
 });
 
+User.afterUpdate(async (user, options) => {
+  const changed = user.changed();
+  const changes = {};
+
+  if (Array.isArray(changed)) {
+    changed.forEach(key => {
+      changes[key] = {
+        from: user._previousDataValues[key],
+        to: user.dataValues[key]
+      };
+    });
+  }
+
+  if (Object.keys(changes).length > 0) {
+    await ActivityLogger.log({
+      userId: options.userId || null,
+      action: 'update',
+      entityType: 'User',
+      entityId: user.id,
+      details: changes,
+      ipAddress: options.ipAddress,
+      userAgent: options.userAgent
+    });
+  }
+});
+
+
+User.afterCreate(async (user, options) => {
+  await ActivityLogger.log({
+    userId: options.userId || null,
+    action: 'create',
+    entityType: 'User',
+    entityId: user.id,
+    details: user.dataValues,
+    ipAddress: options.ipAddress,
+    userAgent: options.userAgent
+  });
+});
+
+User.afterDestroy(async (user, options) => {
+  await ActivityLogger.log({
+    userId: options.userId || null,
+    action: 'delete',
+    entityType: 'User',
+    entityId: user.id,
+    details: user.dataValues,
+    ipAddress: options.ipAddress,
+    userAgent: options.userAgent
+  });
+});
 module.exports = User;

@@ -14,6 +14,7 @@ Doctor.hasMany(Appointment, { foreignKey: 'doctorId' });
 Patient.hasMany(MedicalReport, { foreignKey: 'patientId' });
 Doctor.hasMany(MedicalReport, { foreignKey: 'doctorId' });
 Appointment.hasMany(MedicalReport, { foreignKey: 'appointmentId' });
+ActivityLog.belongsTo(User, { foreignKey: 'userId' });
 
 // Export all models
 module.exports = {

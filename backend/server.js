@@ -21,6 +21,7 @@ const doctorRoutes = require('./routes/doctorRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const medicalReportRoutes = require('./routes/medicalReportRoutes');
 const fileAttachmentRoutes = require('./routes/fileAttachmentRoutes');
+const activityLogsRoutes = require('./routes/activityLogsRoutes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -29,6 +30,7 @@ app.use('/api/doctors', doctorRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/medical-reports', medicalReportRoutes);
 app.use('/api/files', fileAttachmentRoutes);
+app.use('/api/activity-logs', activityLogsRoutes);
 
 // Root route
 app.get('/', (req, res) => {
@@ -41,8 +43,8 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something broke!');
 });
 
-// Sync database and start server
-sequelize.sync({ alter: true })
+// // Sync database and start server
+sequelize.sync({ alter: false })
   .then(() => {
     console.log('Database synced successfully');
     app.listen(PORT, () => {

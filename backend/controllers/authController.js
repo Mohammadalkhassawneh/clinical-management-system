@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const ActivityLogger = require('../utils/ActivityLogger');
 const { User } = require('../models');
 
 // Register a new user
@@ -70,6 +71,16 @@ exports.login = async (req, res) => {
       process.env.JWT_SECRET || 'clinic_management_secret_key',
       { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
     );
+
+    await ActivityLogger.log({
+      userId: user.id,
+      action: 'login',
+      entityType: 'User',
+      entityId: user.id,
+      details: `User ${user.username} logged in.`,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent']
+    });
 
     // Return user without password
     const userWithoutPassword = {
