@@ -24,25 +24,29 @@ if [ ! -f .env ]; then
   echo "Creating .env file..."
   cat > .env << EOF
 PORT=5000
-DB_PATH=./database/clinic.sqlite
+DB_PATH=./database/clinic_management.sqlite
 JWT_SECRET=clinic_management_secret_key
 JWT_EXPIRES_IN=24h
 EOF
 fi
 
 # Initialize database
-echo "Initializing database..."
-node -e "const db = require('./models'); db.sequelize.sync({ force: true }).then(() => { console.log('Database initialized'); process.exit(0); }).catch(err => { console.error('Error initializing database:', err); process.exit(1); });"
+if [ ! -f "./database/clinic_management.sqlite" ]; then
+  echo "Database not found. Initializing..."
+  node -e "const db = require('./models'); db.sequelize.sync({ force: true }).then(() => { console.log('Database initialized'); process.exit(0); }).catch(err => { console.error('Error initializing database:', err); process.exit(1); });"
 
-# Create initial admin user
-echo "Creating initial admin user..."
-node -e "const { User } = require('./models'); const bcrypt = require('bcrypt'); User.create({ username: 'admin', password: bcrypt.hashSync('admin123', 10), firstName: 'Admin', lastName: 'User', email: 'admin@example.com', role: 'admin' }).then(() => { console.log('Admin user created'); process.exit(0); }).catch(err => { console.error('Error creating admin user:', err); process.exit(1); });"
+  # Create initial admin user
+  echo "Creating initial admin user..."
+  node -e "const { User } = require('./models'); const bcrypt = require('bcrypt'); User.create({ username: 'admin', password: bcrypt.hashSync('admin123', 10), firstName: 'Admin', lastName: 'User', email: 'admin@example.com', role: 'admin' }).then(() => { console.log('Admin user created'); process.exit(0); }).catch(err => { console.error('Error creating admin user:', err); process.exit(1); });"
 
-# Create test users
-echo "Creating test users..."
-node -e "const { User, Doctor } = require('./models'); const bcrypt = require('bcrypt'); Promise.all([User.create({ username: 'doctor', password: bcrypt.hashSync('doctor123', 10), firstName: 'John', lastName: 'Doe', email: 'doctor@example.com', role: 'doctor' }).then(user => Doctor.create({ userId: user.id, specialization: 'General Medicine', licenseNumber: 'MD12345' })), User.create({ username: 'receptionist', password: bcrypt.hashSync('receptionist123', 10), firstName: 'Jane', lastName: 'Smith', email: 'receptionist@example.com', role: 'receptionist' })]).then(() => { console.log('Test users created'); process.exit(0); }).catch(err => { console.error('Error creating test users:', err); process.exit(1); });"
+  # Create test users
+  echo "Creating test users..."
+  node -e "const { User, Doctor } = require('./models'); const bcrypt = require('bcrypt'); Promise.all([User.create({ username: 'doctor', password: bcrypt.hashSync('doctor123', 10), firstName: 'John', lastName: 'Doe', email: 'doctor@example.com', role: 'doctor' }).then(user => Doctor.create({ userId: user.id, specialization: 'General Medicine', licenseNumber: 'MD12345' })), User.create({ username: 'receptionist', password: bcrypt.hashSync('receptionist123', 10), firstName: 'Jane', lastName: 'Smith', email: 'receptionist@example.com', role: 'receptionist' })]).then(() => { console.log('Test users created'); process.exit(0); }).catch(err => { console.error('Error creating test users:', err); process.exit(1); });"
+else
+  echo "Database already exists. Skipping initialization."
+fi
 
-# Start backend server
+Start backend server
 echo "Starting backend server..."
 npx nodemon server.js &
 BACKEND_PID=$!
@@ -70,6 +74,6 @@ echo "Receptionist: username=receptionist, password=receptionist123"
 echo ""
 echo "Press Ctrl+C to stop the servers"
 
-# Wait for user to press Ctrl+C
+Wait for user to press Ctrl+C
 trap "kill $BACKEND_PID $FRONTEND_PID; echo 'Servers stopped'; exit" INT
 wait
