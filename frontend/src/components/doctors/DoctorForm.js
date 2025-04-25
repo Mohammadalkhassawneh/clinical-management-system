@@ -101,7 +101,7 @@ const DoctorForm = () => {
 
     try {
       setSubmitting(true);
-      
+
       if (isEditMode) {
         await axios.put(`http://localhost:5000/api/doctors/${id}`, formData);
       } else {

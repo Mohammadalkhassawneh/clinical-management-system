@@ -77,6 +77,11 @@ const Sidebar = () => {
                   Register User
                 </Nav.Link>
               </Nav.Item>
+              <Nav.Item>
+                <Nav.Link as={Link} to="/activity-logs">
+                  Activity Logs report
+                </Nav.Link>
+              </Nav.Item>
             </Nav>
           </>
         )}
